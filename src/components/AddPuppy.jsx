@@ -1,18 +1,14 @@
 import { URL } from "../API";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchAllPlayers } from "../API";
 
-const AddPuppy = (name, breed, imageUrl) => {
+const AddPuppy = ({ players, setPlayers }) => {
   const [newName, setNewName] = useState("");
   const [newBreed, setNewBreed] = useState("");
   const [newImageUrl, setNewImageUrl] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
-    console.log(newName, newBreed);
-
-    function refreshPage() {
-      window.location.reload(false);
-    }
 
     try {
       const result = await fetch(URL, {
@@ -26,11 +22,18 @@ const AddPuppy = (name, breed, imageUrl) => {
       });
       const json = await result.json();
       console.log(json);
-      refreshPage();
-      return json;
     } catch (error) {
       console.error(error);
     }
+    async function getAllPlayers() {
+      const APIResponse = await fetchAllPlayers();
+      if (APIResponse.success) {
+        setPlayers(APIResponse.data.players);
+      } else {
+        setError(APIResponse.error.message);
+      }
+    }
+    getAllPlayers();
   }
 
   return (

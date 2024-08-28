@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { fetchAllPlayers } from "../API";
 import { useNavigate } from "react-router-dom";
-import AddPuppy from "./AddPuppy";
 import { removePlayer } from "../API";
 
 const AllPlayers = ({ players, setPlayers }) => {
@@ -21,6 +20,19 @@ const AllPlayers = ({ players, setPlayers }) => {
     getAllPlayers();
   }, []);
 
+  async function removePuppy(id) {
+    await removePlayer(id);
+    async function getAllPlayers() {
+      const APIResponse = await fetchAllPlayers();
+      if (APIResponse.success) {
+        setPlayers(APIResponse.data.players);
+      } else {
+        setError(APIResponse.error.message);
+      }
+    }
+    getAllPlayers();
+  }
+
   const playersToDisplay = searchParam
     ? players.filter((player) =>
         player.name.toLowerCase().includes(searchParam)
@@ -29,7 +41,6 @@ const AllPlayers = ({ players, setPlayers }) => {
 
   return (
     <>
-      <AddPuppy players={players} setPlayers={setPlayers} />
       <div className="search">
         <label>
           Search:{" "}
@@ -55,7 +66,7 @@ const AllPlayers = ({ players, setPlayers }) => {
             >
               More Details
             </button>
-            <button onClick={() => removePlayer(player.id)}>Delete</button>
+            <button onClick={() => removePuppy(player.id)}>Delete</button>
             <br />
           </h3>
         );
